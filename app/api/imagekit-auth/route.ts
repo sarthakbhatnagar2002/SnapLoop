@@ -8,10 +8,6 @@ export async function GET() {
     const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
     const publicKey = process.env.NEXT_PUBLIC_PUBLIC_KEY;
 
-    console.log("Private Key exists:", !!privateKey);
-    console.log("Public Key exists:", !!publicKey);
-    console.log("Public Key value:", publicKey);
-
     if (!privateKey || !publicKey) {
       console.error("Missing ImageKit credentials");
       return NextResponse.json(
