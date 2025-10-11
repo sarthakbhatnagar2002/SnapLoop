@@ -27,7 +27,7 @@ function Login() {
     if (result?.error) {
       setError(result.error)
     } else {
-      router.push("/") // redirect to home/dashboard
+      router.push("/")
     }
   }
 

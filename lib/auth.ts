@@ -10,11 +10,11 @@ export const authOptions: NextAuthOptions = {
             name: "Credentials",
             credentials: {
                 username: { label: "Username", type: "text" },
-                email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.username || !credentials?.password) {
+                // Changed: only check for username and password
+                if (!credentials?.username || !credentials?.password) {
                     throw new Error("Missing values")
                 }
                 try {
@@ -42,7 +42,6 @@ export const authOptions: NextAuthOptions = {
                 }
             }
         })
-        // ...add more providers here
     ],
     callbacks: {
         async jwt({ token, user }) {
