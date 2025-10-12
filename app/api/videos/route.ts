@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
             ...body,
             controls: body?.controls ?? true,
             transformation: {
-                height: 1920,
-                width: 1080,
+                width: 1920,  
+                height: 1080,
                 quality: body.transformation?.quality ?? 100
             },
         };

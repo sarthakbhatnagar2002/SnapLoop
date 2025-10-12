@@ -1,7 +1,7 @@
-// app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import VideoFeed from "./components/VideoFeed";
 import { IVideo } from "@/models/Video";
 import Link from "next/link";
@@ -10,6 +10,13 @@ import { Upload, Video, Sparkles } from "lucide-react";
 export default function Home() {
   const [videos, setVideos] = useState<IVideo[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+
+  // Debug: Log session info
+  useEffect(() => {
+    console.log("Session Status:", status);
+    console.log("Session Data:", session);
+  }, [session, status]);
 
   useEffect(() => {
     fetchVideos();
@@ -30,6 +37,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Debug Info */}
+        {session && (
+          <div className="mb-4 p-4 bg-green-900/20 border border-green-700 rounded-lg">
+            <p className="text-green-400">✅ Logged in as: {session.user?.username || session.user?.email || session.user?.name}</p>
+          </div>
+        )}
+
         {/* Hero Section with Upload CTA */}
         <div className="mb-12">
           <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 rounded-2xl p-8 backdrop-blur-sm">
