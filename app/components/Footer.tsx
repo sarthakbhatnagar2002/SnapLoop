@@ -8,8 +8,8 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Left - Branding */}
           <div className="flex items-center gap-2">
-            <Video className="w-5 h-5 text-[#58a6ff]" />
-            <span className="text-[#c9d1d9] font-semibold">GitTube</span>
+            <img src="/Logo.png" alt="Logo" className="w-10 h-10" />
+            <span className="text-[#c9d1d9] font-semibold">CodeCast</span>
           </div>
 
           {/* Center - Links */}
@@ -32,7 +32,7 @@ export default function Footer() {
 
           {/* Right - Copyright */}
           <div className="text-sm text-[#8b949e]">
-            © 2025 GitTube
+            © 2025 CodeCast
           </div>
         </div>
       </div>

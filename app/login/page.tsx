@@ -50,7 +50,7 @@ function Login() {
       <div className="w-full max-w-md">
         <div className="bg-gray-900 rounded-lg border border-gray-800 p-8">
           <h2 className="text-2xl font-semibold text-center text-gray-100 mb-6">
-            Sign in to GitTube
+            Sign in to CodeCast
           </h2>
 
           <p className="text-center text-gray-400 text-sm mb-6">

@@ -18,7 +18,7 @@ export async function generateMetadata({
   const resolvedParams = await Promise.resolve(params);
   
   return {
-    title: `${resolvedParams.username} - Profile | GitTube`,
-    description: `View ${resolvedParams.username}'s profile and videos on GitTube`,
+    title: `${resolvedParams.username} - Profile | CodeCast`,
+    description: `View ${resolvedParams.username}'s profile and videos on CodeCast`,
   };
 }

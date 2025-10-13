@@ -32,8 +32,8 @@ export default function Header() {
             href="/"
             className="flex items-center gap-2 text-lg font-semibold text-white hover:text-gray-300 transition-colors"
           >
-            <Video className="w-5 h-5" />
-            <span>GitTube</span>
+            <img src="/Logo.png" alt="Logo" className="w-10 h-10" />
+            <span>CodeCast</span>
           </Link>
 
           {/* Navigation */}
