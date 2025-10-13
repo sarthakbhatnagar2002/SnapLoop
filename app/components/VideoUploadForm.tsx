@@ -2,18 +2,28 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { IKUpload } from "imagekitio-next";
-import { Upload, CheckCircle, Film, Image } from "lucide-react";
+import { Github, Upload } from "lucide-react";
+
+const CATEGORIES = ["Web Dev", "Mobile", "ML/AI", "DevOps", "Game Dev", "Other"];
 
 export default function VideoUploadForm() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const { data: session } = useSession();
+  const router = useRouter();
+  
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    githubRepoUrl: "",
+    demoUrl: "",
+    category: "",
+  });
+  
   const [videoURL, setVideoURL] = useState("");
   const [thumbnailURL, setThumbnailURL] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [uploadingVideo, setUploadingVideo] = useState(false);
-  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
-  const router = useRouter();
+  const [error, setError] = useState("");
 
   const authenticator = async () => {
     const response = await fetch("/api/imagekit-auth");
@@ -23,16 +33,22 @@ export default function VideoUploadForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!videoURL || !thumbnailURL) {
+      setError("Upload both video and thumbnail");
+      return;
+    }
+    
     setUploading(true);
 
     await fetch("/api/videos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title,
-        description,
+        ...formData,
         videoURL,
         thumbnailURL,
+        userId: session?.user?.id,
         controls: true,
       }),
     });
@@ -41,112 +57,101 @@ export default function VideoUploadForm() {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-8 shadow-xl border border-gray-700">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Title
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">
+            <Github className="inline w-4 h-4 mr-1" />
+            GitHub URL *
           </label>
           <input
+            type="url"
+            value={formData.githubRepoUrl}
+            onChange={(e) => setFormData({...formData, githubRepoUrl: e.target.value})}
+            placeholder="https://github.com/user/repo"
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-md focus:ring-1 focus:ring-[#58a6ff]"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Live Demo URL (optional)</label>
+          <input
+            type="url"
+            value={formData.demoUrl}
+            onChange={(e) => setFormData({...formData, demoUrl: e.target.value})}
+            placeholder="https://myproject.com"
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-md focus:ring-1 focus:ring-[#58a6ff]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Title *</label>
+          <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter video title"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            value={formData.title}
+            onChange={(e) => setFormData({...formData, title: e.target.value})}
+            placeholder="Project name"
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-md focus:ring-1 focus:ring-[#58a6ff]"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Description
-          </label>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Description *</label>
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your video"
-            rows={4}
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            placeholder="What does it do?"
+            rows={3}
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-md focus:ring-1 focus:ring-[#58a6ff] resize-none"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            <Film className="inline w-4 h-4 mr-2" />
-            Video File
-          </label>
-          <div className="relative">
-            <IKUpload
-              onSuccess={(res) => {
-                setVideoURL(res.filePath);
-                setUploadingVideo(false);
-              }}
-              onUploadStart={() => setUploadingVideo(true)}
-              authenticator={authenticator}
-              className="file-input file-input-bordered w-full bg-gray-700 border-gray-600 text-white"
-              accept="video/*"
-            />
-            {uploadingVideo && (
-              <div className="absolute right-3 top-3">
-                <span className="loading loading-spinner loading-sm text-blue-500"></span>
-              </div>
-            )}
-            {videoURL && !uploadingVideo && (
-              <div className="mt-2 flex items-center gap-2 text-green-400 text-sm">
-                <CheckCircle className="w-4 h-4" />
-                Video uploaded
-              </div>
-            )}
-          </div>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Category *</label>
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({...formData, category: e.target.value})}
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-md focus:ring-1 focus:ring-[#58a6ff]"
+            required
+          >
+            <option value="">Select</option>
+            {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+          </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            <Image className="inline w-4 h-4 mr-2" />
-            Thumbnail
-          </label>
-          <div className="relative">
-            <IKUpload
-              onSuccess={(res) => {
-                setThumbnailURL(res.filePath);
-                setUploadingThumbnail(false);
-              }}
-              onUploadStart={() => setUploadingThumbnail(true)}
-              authenticator={authenticator}
-              className="file-input file-input-bordered w-full bg-gray-700 border-gray-600 text-white"
-              accept="image/*"
-            />
-            {uploadingThumbnail && (
-              <div className="absolute right-3 top-3">
-                <span className="loading loading-spinner loading-sm text-blue-500"></span>
-              </div>
-            )}
-            {thumbnailURL && !uploadingThumbnail && (
-              <div className="mt-2 flex items-center gap-2 text-green-400 text-sm">
-                <CheckCircle className="w-4 h-4" />
-                Thumbnail uploaded
-              </div>
-            )}
-          </div>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Video *</label>
+          <IKUpload
+            onSuccess={(res) => setVideoURL(res.filePath)}
+            authenticator={authenticator}
+            className="w-full text-sm text-[#c9d1d9] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#238636] file:text-white"
+            accept="video/*"
+          />
+          {videoURL && <p className="text-xs text-[#3fb950] mt-1">✓ Uploaded</p>}
         </div>
+
+        <div>
+          <label className="block text-sm text-[#c9d1d9] mb-1.5">Thumbnail *</label>
+          <IKUpload
+            onSuccess={(res) => setThumbnailURL(res.filePath)}
+            authenticator={authenticator}
+            className="w-full text-sm text-[#c9d1d9] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#238636] file:text-white"
+            accept="image/*"
+          />
+          {thumbnailURL && <p className="text-xs text-[#3fb950] mt-1">✓ Uploaded</p>}
+        </div>
+
+        {error && <p className="text-sm text-[#ff7b72]">{error}</p>}
 
         <button
           type="submit"
-          disabled={uploading || !videoURL || !thumbnailURL || uploadingVideo || uploadingThumbnail}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          disabled={uploading || !videoURL || !thumbnailURL}
+          className="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#21262d] text-white py-2.5 rounded-md disabled:cursor-not-allowed"
         >
-          {uploading ? (
-            <>
-              <span className="loading loading-spinner loading-sm"></span>
-              Saving...
-            </>
-          ) : (
-            <>
-              <Upload className="w-5 h-5" />
-              Upload Video
-            </>
-          )}
+          {uploading ? "Creating..." : "Create Showcase"}
         </button>
       </form>
     </div>

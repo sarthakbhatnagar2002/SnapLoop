@@ -19,23 +19,16 @@ export const authOptions: NextAuthOptions = {
         async signIn({ user, account, profile }) {
             if (account?.provider === "github") {
                 try {
-                    console.log("=== GitHub Sign In Started ===");
-                    console.log("User:", user);
-                    console.log("Account:", account);
-                    
                     await connectToDb();
                     
                     // Type assertion for GitHub profile
                     const githubProfile = profile as { login?: string } | undefined;
                     const githubUsername = githubProfile?.login || user.name || user.email?.split('@')[0] || 'user';
                     
-                    console.log("GitHub Username:", githubUsername);
-                    
                     // Check if user exists with this GitHub ID
                     let existingUser = await User.findOne({ githubId: account.providerAccountId });
                     
                     if (!existingUser) {
-                        console.log("Creating new user...");
                         // Create new user from GitHub profile
                         existingUser = await User.create({
                             githubId: account.providerAccountId,
@@ -44,31 +37,22 @@ export const authOptions: NextAuthOptions = {
                             email: user.email,
                             avatar: user.image,
                         });
-                        console.log("User created:", existingUser);
                     } else {
-                        console.log("User exists, updating...");
                         // Update existing user info
                         existingUser.avatar = user.image;
                         existingUser.email = user.email;
                         await existingUser.save();
-                        console.log("User updated");
                     }
                     
-                    console.log("=== GitHub Sign In Success ===");
                     return true;
                 } catch (error) {
-                    console.error("=== GitHub sign in error ===", error);
+                    console.error("GitHub sign in error:", error);
                     return false;
                 }
             }
             return true;
         },
         async jwt({ token, user, account }) {
-            console.log("=== JWT Callback ===");
-            console.log("Token:", token);
-            console.log("User:", user);
-            console.log("Account:", account);
-            
             if (user) {
                 token.id = user.id;
                 token.username = user.name || undefined;
@@ -82,17 +66,12 @@ export const authOptions: NextAuthOptions = {
                     token.id = dbUser._id.toString();
                     token.username = dbUser.username;
                     token.picture = dbUser.avatar || undefined;
-                    console.log("Set token from DB user:", token);
                 }
             }
             
             return token;
         },
         async session({ session, token }) {
-            console.log("=== Session Callback ===");
-            console.log("Session before:", session);
-            console.log("Token:", token);
-            
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.username = token.username as string;
@@ -101,7 +80,6 @@ export const authOptions: NextAuthOptions = {
                 }
             }
             
-            console.log("Session after:", session);
             return session;
         }
     },
@@ -110,5 +88,4 @@ export const authOptions: NextAuthOptions = {
         maxAge: 30 * 24 * 60 * 60,
     },
     secret: process.env.NEXTAUTH_SECRET,
-    debug: true,
 };

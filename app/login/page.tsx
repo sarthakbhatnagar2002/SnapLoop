@@ -10,16 +10,9 @@ function Login() {
   const router = useRouter()
   const { data: session, status } = useSession()
 
-  // Debug logging
-  useEffect(() => {
-    console.log("Login Page - Status:", status);
-    console.log("Login Page - Session:", session);
-  }, [status, session])
-
   // Redirect if already logged in
   useEffect(() => {
     if (status === "authenticated") {
-      console.log("User authenticated, redirecting to home...");
       router.push("/")
     }
   }, [status, router])
@@ -27,14 +20,12 @@ function Login() {
   const handleGithubSignIn = async () => {
     setError("")
     setLoading(true)
-    console.log("Starting GitHub sign in...");
     
     try {
       await signIn("github", { 
         callbackUrl: "/",
       })
     } catch (error) {
-      console.error("GitHub sign in error:", error);
       setError("Failed to sign in with GitHub")
       setLoading(false)
     }
@@ -59,7 +50,7 @@ function Login() {
       <div className="w-full max-w-md">
         <div className="bg-gray-900 rounded-lg border border-gray-800 p-8">
           <h2 className="text-2xl font-semibold text-center text-gray-100 mb-6">
-            Sign in to DevShowcase
+            Sign in to GitTube
           </h2>
 
           <p className="text-center text-gray-400 text-sm mb-6">
