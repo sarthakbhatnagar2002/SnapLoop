@@ -71,10 +71,6 @@ export default function Home() {
               </>
             )}
           </div>
-
-          <p className="text-sm text-[#8b949e] mt-6">
-            {videos.length} project {videos.length === 1 ? 'showcase' : 'showcases'} · Join the community
-          </p>
         </div>
 
         {/* Divider */}

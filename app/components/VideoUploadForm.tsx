@@ -125,7 +125,7 @@ export default function VideoUploadForm() {
         <div>
           <label className="block text-sm text-[#c9d1d9] mb-1.5">Video *</label>
           <IKUpload
-            onSuccess={(res) => setVideoURL(res.filePath)}
+            onSuccess={(res) => setVideoURL(res.url)}
             authenticator={authenticator}
             className="w-full text-sm text-[#c9d1d9] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#238636] file:text-white"
             accept="video/*"
@@ -136,7 +136,7 @@ export default function VideoUploadForm() {
         <div>
           <label className="block text-sm text-[#c9d1d9] mb-1.5">Thumbnail *</label>
           <IKUpload
-            onSuccess={(res) => setThumbnailURL(res.filePath)}
+            onSuccess={(res) => setThumbnailURL(res.url)}
             authenticator={authenticator}
             className="w-full text-sm text-[#c9d1d9] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#238636] file:text-white"
             accept="image/*"
