@@ -2,7 +2,6 @@
 
 import { useEffect, useState, use } from "react";
 import { useSession } from "next-auth/react";
-import { IKVideo } from "imagekitio-next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,8 +13,8 @@ import {
   Calendar,
   ExternalLink,
   User,
-  MessageCircle,
 } from "lucide-react";
+import VideoPlayer from "@/app/components/VideoPlayer";
 import { IVideo } from "@/models/Video";
 import { IUser } from "@/models/User";
 
@@ -107,7 +106,7 @@ export default function VideoDetailPage({
   }
 
   const { video, creator } = data;
-  const createdDate = new Date(video.createdAt || "");
+  const createdDate = video.createdAt ? new Date(video.createdAt) : new Date();
 
   return (
     <div className="min-h-screen bg-[#0d1117]">
@@ -126,13 +125,11 @@ export default function VideoDetailPage({
           <div className="lg:col-span-2 space-y-6">
             {/* Video Player */}
             <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
-              <div className="relative w-full bg-black" style={{ aspectRatio: "16/9" }}>
-                <IKVideo
-                  path={video.videoURL}
-                  controls
-                  className="w-full h-full"
-                />
-              </div>
+              <VideoPlayer
+                videoUrl={video.videoURL}
+                posterUrl={video.thumbnailURL}
+                title={video.title}
+              />
             </div>
 
             {/* Video Title & Stats */}

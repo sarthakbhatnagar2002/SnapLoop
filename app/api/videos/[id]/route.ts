@@ -11,7 +11,11 @@ export async function GET(
     await connectToDb();
     const { id } = params;
 
-    const video = await Video.findById(id);
+    const video = await Video.findByIdAndUpdate(
+      id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
 
     if (!video) {
       return NextResponse.json(
@@ -22,15 +26,12 @@ export async function GET(
 
     // Fetch creator info
     const creator = await User.findById(video.userId).select(
-      "username avatar githubUsername email"
+      "username avatar githubUsername email _id"
     );
-
-    // Increment view count
-    await Video.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
     return NextResponse.json({
       video: video.toObject(),
-      creator,
+      creator: creator?.toObject(),
     });
   } catch (error) {
     console.error("Error fetching video:", error);

@@ -2,23 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import VideoFeed from "./components/VideoFeed";
+import CategoryFilter from "./components/CategoryFilter";
 import { IVideo } from "@/models/Video";
 import Link from "next/link";
-import { Github, Code2, Sparkles } from "lucide-react";
+import { Github, Code2 } from "lucide-react";
 
 export default function Home() {
   const [videos, setVideos] = useState<IVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const category = searchParams?.get("category");
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+  }, [category]);
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch("/api/videos");
+      setLoading(true);
+      let url = "/api/videos";
+      
+      // Add category filter to API call if selected
+      if (category) {
+        url += `?category=${encodeURIComponent(category)}`;
+      }
+      
+      const response = await fetch(url);
       const data = await response.json();
       setVideos(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -76,11 +88,16 @@ export default function Home() {
         {/* Divider */}
         <div className="border-t border-[#21262d] mb-12"></div>
 
+        {/* Filter Section */}
+        <div className="mb-12 bg-[#161b22] border border-[#30363d] rounded-lg p-6">
+          <CategoryFilter />
+        </div>
+
         {/* Videos Section */}
         <div>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-semibold text-[#c9d1d9]">
-              Discover New Projects
+              {category ? `${category} Projects` : "Discover New Projects"}
             </h2>
           </div>
           
@@ -92,8 +109,14 @@ export default function Home() {
           ) : videos.length === 0 ? (
             <div className="text-center py-24 bg-[#161b22] border border-[#30363d] rounded-lg">
               <Github className="w-12 h-12 text-[#6e7681] mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-[#c9d1d9] mb-2">No projects yet</h3>
-              <p className="text-[#8b949e] mb-6">Be the first to showcase your work</p>
+              <h3 className="text-lg font-semibold text-[#c9d1d9] mb-2">
+                {category ? "No projects in this category" : "No projects yet"}
+              </h3>
+              <p className="text-[#8b949e] mb-6">
+                {category
+                  ? "Try selecting a different category"
+                  : "Be the first to showcase your work"}
+              </p>
               {session && (
                 <Link 
                   href="/upload"
