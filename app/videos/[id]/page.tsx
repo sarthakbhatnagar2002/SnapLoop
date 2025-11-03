@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useSession } from "next-auth/react";
 import { IKVideo } from "imagekitio-next";
 import Image from "next/image";
@@ -27,22 +27,23 @@ interface VideoDetailResponse {
 export default function VideoDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { data: session } = useSession();
   const [data, setData] = useState<VideoDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [liked, setLiked] = useState(false);
+  const { id } = use(params);
 
   useEffect(() => {
     fetchVideoDetails();
-  }, [params.id]);
+  }, [id]);
 
   const fetchVideoDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/videos/${params.id}`);
+      const response = await fetch(`/api/videos/${id}`);
 
       if (!response.ok) {
         throw new Error("Video not found");
@@ -64,7 +65,7 @@ export default function VideoDetailPage({
     }
 
     try {
-      const response = await fetch(`/api/videos/${params.id}/like`, {
+      const response = await fetch(`/api/videos/${id}/like`, {
         method: "POST",
       });
 
