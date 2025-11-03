@@ -21,6 +21,17 @@ export interface IVideo {
         width: number;
         quality: number;
     };
+    // Repo metadata
+    repoName?: string;
+    repoDescription?: string;
+    repoStars?: number;
+    repoLanguage?: string;
+    repoTopics?: string[];
+    // Engagement
+    views?: number;
+    likes?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 const videoSchema = new Schema<IVideo>(
@@ -39,6 +50,15 @@ const videoSchema = new Schema<IVideo>(
             width: { type: Number, default: video_dimensions.width },
             quality: { type: Number, min: 1, max: 100 },
         },
+        // Repo metadata
+        repoName: { type: String },
+        repoDescription: { type: String },
+        repoStars: { type: Number, default: 0 },
+        repoLanguage: { type: String },
+        repoTopics: [{ type: String }],
+        // Engagement
+        views: { type: Number, default: 0 },
+        likes: { type: Number, default: 0 },
     },
     {
         timestamps: true
