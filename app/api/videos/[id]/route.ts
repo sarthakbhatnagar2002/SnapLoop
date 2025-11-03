@@ -5,11 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDb();
-    const { id } = params;
+    const { id } = await params;
 
     const video = await Video.findByIdAndUpdate(
       id,
@@ -44,10 +44,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await connectToDb();
 
     const video = await Video.findByIdAndDelete(id);
